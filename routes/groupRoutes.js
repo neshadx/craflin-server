@@ -1,9 +1,15 @@
 const express = require("express");
 const router = express.Router();
 
-const { getAllGroups } = require("../controllers/groupController");
+const {
+  getAllGroups,
+  createGroup
+} = require("../controllers/groupController");
 
-// Route: GET /api/groups
+// GET: All groups
 router.get("/", getAllGroups);
+
+// POST: Create new group
+router.post("/", createGroup);
 
 module.exports = router;
