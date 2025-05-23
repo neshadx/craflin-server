@@ -168,28 +168,26 @@
 
 
 
-
-
-
-
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
 
 const groupRoutes = require('./routes/groupRoutes');
-const authRoutes = require('./routes/authRoutes'); // ✅ Added auth routes
+const authRoutes = require('./routes/authRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// ✅ CORS Middleware
+// ✅ CORS Middleware with all frontend URLs
 app.use(cors({
   origin: [
-    "http://localhost:5173", // Local frontend
-    "https://craflin-client.vercel.app" // 🔁 Replace with your real frontend deployed URL
+    "http://localhost:5173",                   // local dev
+    "http://localhost:5123",                   // optional fallback local
+    "https://craflin-client.vercel.app",       // vercel deployed frontend
+    "https://craflin-client.web.app"           // firebase deployed frontend (if used)
   ],
-  methods: ["GET", "POST", "PUT", "DELETE"],
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
   credentials: true
 }));
 
@@ -206,7 +204,7 @@ mongoose.connect(process.env.MONGODB_URI, {
 
 // ✅ Routes
 app.use('/api/groups', groupRoutes);
-app.use('/api/auth', authRoutes); // ✅ Register auth API route
+app.use('/api/auth', authRoutes);
 
 // ✅ Health Check
 app.get('/', (req, res) => {
