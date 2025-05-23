@@ -1,6 +1,4 @@
 
-
-
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
@@ -25,15 +23,17 @@ mongoose
 
 // Routes
 const groupRoutes = require("./routes/groupRoutes");
-app.use("/api/groups", groupRoutes);
+const authRoutes = require("./routes/authRoutes");
 
-// Root check
+app.use("/api/groups", groupRoutes);
+app.use("/api/auth", authRoutes);
+
+// Root route
 app.get("/", (req, res) => {
   res.send("Craflin Backend Running");
 });
 
-// Start
+// Start server
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
-

@@ -3,13 +3,25 @@ const router = express.Router();
 
 const {
   getAllGroups,
-  createGroup
+  getGroupById,
+  createGroup,
+  joinGroup,
+  getMyGroups,
+  updateGroup,
+  deleteGroup
 } = require("../controllers/groupController");
 
-// GET: All groups
-router.get("/", getAllGroups);
+const verifyJWT = require("../middlewares/verifyJWT");
 
-// POST: Create new group
-router.post("/", createGroup);
+// Public routes
+router.get("/", getAllGroups);
+router.get("/:id", verifyJWT, getGroupById);
+
+// Protected routes
+router.post("/", verifyJWT, createGroup);
+router.patch("/join/:id", verifyJWT, joinGroup);
+router.get("/my-groups/list", verifyJWT, getMyGroups);
+router.put("/:id", verifyJWT, updateGroup);
+router.delete("/:id", verifyJWT, deleteGroup);
 
 module.exports = router;
