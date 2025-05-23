@@ -43,7 +43,7 @@ const authRoutes = require("./routes/authRoutes");
 app.use("/api/groups", groupRoutes);
 app.use("/api/auth", authRoutes);
 
-//  Root Route
+// Root Route
 app.get("/", (req, res) => {
   res.send("Craflin Backend Running");
 });
