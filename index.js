@@ -24,7 +24,7 @@ app.use((req, res, next) => {
   next();
 });
 
-// Middleware to parse JSON request bodies
+//  Parse JSON request bodies
 app.use(express.json());
 
 //  Connect to MongoDB
@@ -33,23 +33,23 @@ mongoose
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
-  .then(() => console.log("MongoDB Connected"))
-  .catch((err) => console.error("MongoDB Error:", err));
+  .then(() => console.log(" MongoDB Connected"))
+  .catch((err) => console.error(" MongoDB Error:", err));
 
-//  Import routes
+//  Import Routes
 const groupRoutes = require("./routes/groupRoutes");
 const authRoutes = require("./routes/authRoutes");
 
-//  Setup routes
+//  Apply Routes
 app.use("/api/groups", groupRoutes);
 app.use("/api/auth", authRoutes);
 
-//  Basic root route
+//  Root route
 app.get("/", (req, res) => {
   res.send("Craflin Backend Running ");
 });
 
 //  Start the server
 app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
+  console.log(` Server running on port ${port}`);
 });
