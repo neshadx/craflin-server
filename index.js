@@ -165,66 +165,60 @@
 
 
 
+require("dotenv").config();
+const express = require("express");
+const cors = require("cors");
+const mongoose = require("mongoose");
 
-require('dotenv').config();
-const express = require('express');
-const cors = require('cors');
-const mongoose = require('mongoose');
-
-const groupRoutes = require('./routes/groupRoutes');
-const authRoutes = require('./routes/authRoutes');
+const groupRoutes = require("./routes/groupRoutes");
+const authRoutes = require("./routes/authRoutes");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// ✅ CORS Middleware
+// ✅ Step 1: CORS
 app.use(cors({
-  origin: [
-    "http://localhost:5173",
-    "http://localhost:5174",
-    "https://craflin-client.vercel.app",
-    "https://craflin-client.web.app"
-  ],
+  origin: "*", // Temporary for testing; replace with array of allowed origins in production
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
-  credentials: true
+  credentials: true,
 }));
 
-// ✅ Custom CORS Headers (Forcefully override Vercel issues)
+// ✅ Step 2: Manual override for stubborn CORS
 app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "*"); // Use "*" or set specific URL like "http://localhost:5173"
-  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH, OPTIONS");
+  res.header("Access-Control-Allow-Origin", "*"); // Try specific frontend if * fails
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
   next();
 });
 
-// ✅ Middleware
+// ✅ Step 3: Middleware
 app.use(express.json());
 
-// ✅ MongoDB Connection
+// ✅ Step 4: DB connect
 mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
-  useUnifiedTopology: true
+  useUnifiedTopology: true,
 })
-.then(() => console.log('✅ Connected to MongoDB'))
-.catch((err) => console.error('❌ MongoDB connection error:', err));
+.then(() => console.log("✅ Connected to MongoDB"))
+.catch((err) => console.error("❌ MongoDB connection error:", err));
 
-// ✅ Routes
-app.use('/api/groups', groupRoutes);
-app.use('/api/auth', authRoutes);
+// ✅ Step 5: Routes
+app.use("/api/groups", groupRoutes);
+app.use("/api/auth", authRoutes);
 
-// ✅ Health Check
-app.get('/', (req, res) => {
-  res.send('🎯 Craflin Server is running!');
+// ✅ Step 6: Health
+app.get("/", (req, res) => {
+  res.send("🎯 Craflin backend is alive.");
 });
 
-// ✅ Error Handling
+// ✅ Step 7: Error
 app.use((err, req, res, next) => {
-  console.error('Unhandled Error:', err);
-  res.status(500).json({ error: 'Internal Server Error' });
+  console.error(err.stack);
+  res.status(500).json({ error: "Something went wrong." });
 });
 
-// ✅ Start Server
+// ✅ Step 8: Server start
 app.listen(PORT, () => {
-  console.log(`🚀 Server running at http://localhost:${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`);
 });
