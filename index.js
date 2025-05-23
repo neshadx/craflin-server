@@ -3,6 +3,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
+const cors = require("cors"); 
 
 // Load environment variables
 dotenv.config();
@@ -10,45 +11,38 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT || 5000;
 
-//  Wildcard CORS to support localhost and any frontend
-app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "*"); // <-- Allow all origins for now
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
-  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH, OPTIONS");
-  res.header("Access-Control-Allow-Credentials", "true");
+//  Proper CORS setup for localhost + frontend deployment
+app.use(cors({
+  origin: ["http://localhost:5173", "https://craflin-client.vercel.app"], // include frontend origins
+  credentials: true,
+}));
 
-  if (req.method === "OPTIONS") {
-    return res.sendStatus(200); //  Preflight fix
-  }
-
-  next();
-});
-
-//  Parse JSON bodies
+//  Body parser for JSON requests
 app.use(express.json());
 
-//  MongoDB Connection
+//  Connect to MongoDB
 mongoose
   .connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
-  .then(() => console.log(" MongoDB Connected"))
-  .catch((err) => console.error("❌ MongoDB Error:", err));
+  .then(() => console.log("MongoDB Connected"))
+  .catch((err) => console.error("MongoDB Error:", err));
 
-//  Import and Apply Routes
+//  Import routes
 const groupRoutes = require("./routes/groupRoutes");
 const authRoutes = require("./routes/authRoutes");
 
+// Apply routes
 app.use("/api/groups", groupRoutes);
 app.use("/api/auth", authRoutes);
 
-// Root Route
+// Root health check route
 app.get("/", (req, res) => {
   res.send("Craflin Backend Running");
 });
 
-//  Start Server
+//  Start the server
 app.listen(port, () => {
-  console.log(` Server running on port ${port}`);
+  console.log(`🚀 Server running on port ${port}`);
 });
