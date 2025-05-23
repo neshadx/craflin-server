@@ -160,10 +160,8 @@
 
 
 
-
 require("dotenv").config();
 const express = require("express");
-const cors = require("cors");
 const mongoose = require("mongoose");
 
 const groupRoutes = require("./routes/groupRoutes");
@@ -172,37 +170,44 @@ const authRoutes = require("./routes/authRoutes");
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// ✅ Enable All CORS Access
-app.use(cors());
-app.options("*", cors()); // Handle preflight requests
+// ✅ Minimal CORS manually handled (No CORS package!)
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "*"); // 👈 Change to specific origin in production
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(200);
+  }
+  next();
+});
 
-// ✅ Body Parser
+// ✅ JSON Parser
 app.use(express.json());
 
-// ✅ MongoDB Connect
+// ✅ Connect MongoDB
 mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
-  useUnifiedTopology: true
+  useUnifiedTopology: true,
 })
-.then(() => console.log("✅ MongoDB connected"))
-.catch((err) => console.error("❌ MongoDB error:", err));
+.then(() => console.log("✅ Connected to MongoDB"))
+.catch((err) => console.error("❌ MongoDB Error:", err));
 
 // ✅ Routes
 app.use("/api/groups", groupRoutes);
 app.use("/api/auth", authRoutes);
 
-// ✅ Health Check
+// ✅ Health
 app.get("/", (req, res) => {
-  res.send("🎯 Server running and CORS open to all origins");
+  res.send("🎯 Backend is LIVE and CORS is open.");
 });
 
-// ✅ Error Handler
+// ✅ Error Handling
 app.use((err, req, res, next) => {
-  console.error("Server Error:", err.stack);
-  res.status(500).json({ error: "Something went wrong!" });
+  console.error(err);
+  res.status(500).json({ error: "Something broke!" });
 });
 
-// ✅ Start Server
+// ✅ Start
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`);
 });
