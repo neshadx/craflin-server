@@ -58,32 +58,61 @@
 
 
 
+// const express = require('express');
+// const router = express.Router();
+// const Group = require('../models/Group');
+
+// // Create Group
+// router.post('/', async (req, res) => {
+//   try {
+//     const group = new Group({
+//       ...req.body,
+//       createdAt: new Date()
+//     });
+    
+//     await group.save();
+    
+//     res.status(201).json({
+//       success: true,
+//       message: 'Group created successfully',
+//       group: group
+//     });
+    
+//   } catch (error) {
+//     res.status(400).json({
+//       success: false,
+//       error: error.message
+//     });
+//   }
+// });
+
+// module.exports = router;
+
+
+
 const express = require('express');
 const router = express.Router();
-const Group = require('../models/Group');
+const {
+  getAllGroups,
+  getGroupById,
+  createGroup,
+  joinGroup,
+  getMyGroups,
+  updateGroup,
+  deleteGroup,
+} = require('../controllers/groupController');
 
-// Create Group
-router.post('/', async (req, res) => {
-  try {
-    const group = new Group({
-      ...req.body,
-      createdAt: new Date()
-    });
-    
-    await group.save();
-    
-    res.status(201).json({
-      success: true,
-      message: 'Group created successfully',
-      group: group
-    });
-    
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      error: error.message
-    });
-  }
-});
+const verifyJWT = require('../middlewares/verifyJWT');
+
+// Public Routes
+router.get('/', getAllGroups);              // GET all groups
+router.get('/:id', getGroupById);           // GET group by ID
+
+// Protected Routes
+router.post('/', verifyJWT, createGroup);           // Create new group
+router.patch('/join/:id', verifyJWT, joinGroup);    // Join group
+router.get('/my/groups', verifyJWT, getMyGroups);   // My groups
+router.put('/:id', verifyJWT, updateGroup);         // Update group
+router.delete('/:id', verifyJWT, deleteGroup);      // Delete group
 
 module.exports = router;

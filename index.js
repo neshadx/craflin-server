@@ -155,51 +155,71 @@
 // });
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
+
 const groupRoutes = require('./routes/groupRoutes');
+const authRoutes = require('./routes/authRoutes'); // ✅ Added auth routes
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Enhanced CORS Configuration
+// ✅ CORS Middleware
 app.use(cors({
   origin: [
-    "http://localhost:5173", // Your frontend URL
-    "https://your-production-domain.com"
+    "http://localhost:5173", // Local frontend
+    "https://craflin-client.vercel.app" // 🔁 Replace with your real frontend deployed URL
   ],
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
+  methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true
 }));
 
-// Handle preflight requests
-app.options('*', cors());
-
-// Database Connection
-mongoose.connect(process.env.MONGODB_URI)
-  .then(() => console.log('Connected to MongoDB'))
-  .catch(err => console.error('MongoDB connection error:', err));
-
-// Middleware
+// ✅ Middleware
 app.use(express.json());
 
-// Routes
-app.use('/api/groups', groupRoutes);
+// ✅ Database Connection
+mongoose.connect(process.env.MONGODB_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+})
+.then(() => console.log('✅ Connected to MongoDB'))
+.catch((err) => console.error('❌ MongoDB connection error:', err));
 
-// Health Check
+// ✅ Routes
+app.use('/api/groups', groupRoutes);
+app.use('/api/auth', authRoutes); // ✅ Register auth API route
+
+// ✅ Health Check
 app.get('/', (req, res) => {
-  res.send('Server is running');
+  res.send('🎯 Craflin Server is running!');
 });
 
-// Error Handling
+// ✅ Error Handling Middleware
 app.use((err, req, res, next) => {
-  console.error(err.stack);
+  console.error('Unhandled Error:', err);
   res.status(500).json({ error: 'Internal Server Error' });
 });
 
+// ✅ Server Start
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`🚀 Server running at http://localhost:${PORT}`);
 });
