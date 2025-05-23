@@ -163,8 +163,6 @@
 
 
 
-
-
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
@@ -176,49 +174,56 @@ const authRoutes = require("./routes/authRoutes");
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// ✅ Step 1: CORS
+// ✅ CORS Configuration
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:5174",
+  "https://craflin-client.vercel.app",
+  "https://craflin-client.web.app"
+];
+
 app.use(cors({
-  origin: "*", // Temporary for testing; replace with array of allowed origins in production
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) === -1) {
+      const msg = `The CORS policy for this site does not allow access from the specified Origin: ${origin}`;
+      return callback(new Error(msg), false);
+    }
+    return callback(null, true);
+  },
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
-  credentials: true,
+  credentials: true
 }));
 
-// ✅ Step 2: Manual override for stubborn CORS
-app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "*"); // Try specific frontend if * fails
-  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
-  next();
-});
-
-// ✅ Step 3: Middleware
+// ✅ Middleware
 app.use(express.json());
 
-// ✅ Step 4: DB connect
+// ✅ MongoDB Connection
 mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
-  useUnifiedTopology: true,
+  useUnifiedTopology: true
 })
 .then(() => console.log("✅ Connected to MongoDB"))
 .catch((err) => console.error("❌ MongoDB connection error:", err));
 
-// ✅ Step 5: Routes
+// ✅ Routes
 app.use("/api/groups", groupRoutes);
 app.use("/api/auth", authRoutes);
 
-// ✅ Step 6: Health
+// ✅ Health Check
 app.get("/", (req, res) => {
   res.send("🎯 Craflin backend is alive.");
 });
 
-// ✅ Step 7: Error
+// ✅ Error Handling
 app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ error: "Something went wrong." });
+  console.error("Unhandled Error:", err);
+  res.status(500).json({ error: "Internal Server Error" });
 });
 
-// ✅ Step 8: Server start
+// ✅ Start Server
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });
