@@ -21,6 +21,8 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
+    await client.connect(); // Necessary for Vercel serverless
+
     const db = client.db("craflinDB");
     const groupCollection = db.collection("groups");
 
