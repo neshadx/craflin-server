@@ -1,4 +1,3 @@
-
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
@@ -8,8 +7,13 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT || 5000;
 
-// Middleware
-app.use(cors());
+// FIXED CORS for localhost + frontend domain
+app.use(cors({
+  origin: ["http://localhost:5173", "https://craflin-client.vercel.app"],
+  credentials: true
+}));
+
+// Parse JSON requests
 app.use(express.json());
 
 // MongoDB connect
@@ -28,7 +32,7 @@ const authRoutes = require("./routes/authRoutes");
 app.use("/api/groups", groupRoutes);
 app.use("/api/auth", authRoutes);
 
-// Root route
+//  Root route
 app.get("/", (req, res) => {
   res.send("Craflin Backend Running");
 });
