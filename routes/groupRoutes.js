@@ -56,43 +56,34 @@
 
 // module.exports = router;
 
+
+
 const express = require('express');
 const router = express.Router();
 const Group = require('../models/Group');
 
-// Create a new group
+// Create Group
 router.post('/', async (req, res) => {
   try {
-    // Validate request body
-    const { name, description, location, maxMembers, startDate, imageUrl } = req.body;
-    
-    if (!name || !description || !location || !maxMembers || !startDate || !imageUrl) {
-      return res.status(400).json({ message: 'All fields are required' });
-    }
-
-    const newGroup = new Group({
+    const group = new Group({
       ...req.body,
       createdAt: new Date()
     });
-
-    await newGroup.save();
+    
+    await group.save();
     
     res.status(201).json({
       success: true,
       message: 'Group created successfully',
-      group: newGroup
+      group: group
     });
     
   } catch (error) {
-    console.error('Error creating group:', error);
-    res.status(500).json({ 
+    res.status(400).json({
       success: false,
-      message: 'Failed to create group',
-      error: error.message 
+      error: error.message
     });
   }
 });
 
-// Add other group routes as needed
 module.exports = router;
-
