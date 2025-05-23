@@ -161,8 +161,6 @@
 
 
 
-
-
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
@@ -174,39 +172,20 @@ const authRoutes = require("./routes/authRoutes");
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// ✅ CORS Configuration
-const allowedOrigins = [
-  "http://localhost:5173",
-  "http://localhost:5174",
-  "https://craflin-client.vercel.app",
-  "https://craflin-client.web.app"
-];
+// ✅ Enable All CORS Access
+app.use(cors());
+app.options("*", cors()); // Handle preflight requests
 
-app.use(cors({
-  origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.indexOf(origin) === -1) {
-      const msg = `The CORS policy for this site does not allow access from the specified Origin: ${origin}`;
-      return callback(new Error(msg), false);
-    }
-    return callback(null, true);
-  },
-  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-  credentials: true
-}));
-
-// ✅ Middleware
+// ✅ Body Parser
 app.use(express.json());
 
-// ✅ MongoDB Connection
+// ✅ MongoDB Connect
 mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true
 })
-.then(() => console.log("✅ Connected to MongoDB"))
-.catch((err) => console.error("❌ MongoDB connection error:", err));
+.then(() => console.log("✅ MongoDB connected"))
+.catch((err) => console.error("❌ MongoDB error:", err));
 
 // ✅ Routes
 app.use("/api/groups", groupRoutes);
@@ -214,16 +193,16 @@ app.use("/api/auth", authRoutes);
 
 // ✅ Health Check
 app.get("/", (req, res) => {
-  res.send("🎯 Craflin backend is alive.");
+  res.send("🎯 Server running and CORS open to all origins");
 });
 
-// ✅ Error Handling
+// ✅ Error Handler
 app.use((err, req, res, next) => {
-  console.error("Unhandled Error:", err);
-  res.status(500).json({ error: "Internal Server Error" });
+  console.error("Server Error:", err.stack);
+  res.status(500).json({ error: "Something went wrong!" });
 });
 
 // ✅ Start Server
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`🚀 Server running on http://localhost:${PORT}`);
 });
