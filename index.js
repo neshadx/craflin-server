@@ -21,41 +21,61 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
-    await client.connect(); // Necessary for Vercel serverless
+    await client.connect(); 
 
     const db = client.db("craflinDB");
     const groupCollection = db.collection("groups");
 
     app.post("/api/groups", async (req, res) => {
-      const group = req.body;
-      const result = await groupCollection.insertOne(group);
-      res.status(201).send(result);
+      try {
+        const group = req.body;
+        const result = await groupCollection.insertOne(group);
+        res.status(201).send(result);
+      } catch (err) {
+        console.error("POST /api/groups error:", err);
+        res.status(500).send({ error: "Failed to create group" });
+      }
     });
 
     app.get("/api/groups", async (req, res) => {
-      const groups = await groupCollection.find().toArray();
-      res.send(groups);
+      try {
+        const groups = await groupCollection.find().toArray();
+        res.send(groups);
+      } catch (err) {
+        console.error("GET /api/groups error:", err);
+        res.status(500).send({ error: "Failed to fetch groups" });
+      }
     });
 
     app.get("/api/groups/:id", async (req, res) => {
-      const id = req.params.id;
-      const group = await groupCollection.findOne({ _id: new ObjectId(id) });
-      if (!group) return res.status(404).send({ error: "Group not found" });
-      res.send(group);
+      try {
+        const id = req.params.id;
+        const group = await groupCollection.findOne({ _id: new ObjectId(id) });
+        if (!group) return res.status(404).send({ error: "Group not found" });
+        res.send(group);
+      } catch (err) {
+        console.error("GET /api/groups/:id error:", err);
+        res.status(500).send({ error: "Failed to fetch group" });
+      }
     });
 
     app.delete("/api/groups/:id", async (req, res) => {
-      const id = req.params.id;
-      const result = await groupCollection.deleteOne({ _id: new ObjectId(id) });
-      res.send(result);
+      try {
+        const id = req.params.id;
+        const result = await groupCollection.deleteOne({ _id: new ObjectId(id) });
+        res.send(result);
+      } catch (err) {
+        console.error("DELETE /api/groups/:id error:", err);
+        res.status(500).send({ error: "Failed to delete group" });
+      }
     });
 
     app.get("/", (req, res) => {
-      res.send(" Craflin backend is running!");
+      res.send("🎯 Craflin backend is running!");
     });
 
     await client.db("admin").command({ ping: 1 });
-    console.log(" Connected to MongoDB");
+    console.log("Connected to MongoDB");
   } catch (err) {
     console.error("MongoDB Error:", err);
   }
