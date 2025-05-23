@@ -49,6 +49,61 @@
 
 
 
+// require('dotenv').config();
+// const express = require('express');
+// const cors = require('cors');
+// const mongoose = require('mongoose');
+// const groupRoutes = require('./routes/groupRoutes');
+
+// const app = express();
+// const PORT = process.env.PORT || 5000;
+
+// // Enhanced CORS Configuration
+// const corsOptions = {
+//   origin: [
+//     "http://localhost:5123", 
+//     "http://localhost:5173",
+//     "https://your-frontend-domain.com"
+//   ],
+//   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+//   allowedHeaders: ["Content-Type", "Authorization"],
+//   credentials: true,
+//   optionsSuccessStatus: 200 // For legacy browser support
+// };
+
+// app.use(cors(corsOptions));
+
+// // Handle preflight requests
+// app.options('*', cors(corsOptions));
+
+// // Middleware
+// app.use(express.json());
+
+// // Database Connection
+// mongoose.connect(process.env.MONGODB_URI)
+//   .then(() => console.log('Connected to MongoDB'))
+//   .catch(err => console.error('MongoDB connection error:', err));
+
+// // Routes
+// app.use('/api/groups', groupRoutes); // Fixed endpoint path
+
+// // Health Check
+// app.get('/', (req, res) => {
+//   res.status(200).json({ message: 'Server is running' });
+// });
+
+// // Error Handling Middleware
+// app.use((err, req, res, next) => {
+//   console.error(err.stack);
+//   res.status(500).json({ error: 'Internal Server Error' });
+// });
+
+// app.listen(PORT, () => {
+//   console.log(`Server running on port ${PORT}`);
+// });
+
+
+
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
@@ -58,46 +113,49 @@ const groupRoutes = require('./routes/groupRoutes');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Enhanced CORS Configuration
+//  Enhanced CORS Configuration
 const corsOptions = {
   origin: [
+    "http://localhost:5173", 
     "http://localhost:5123", 
-    "http://localhost:5173",
-    "https://your-frontend-domain.com"
+    "https://craflin-client.web.app", // use your actual deployed client domain
+    "https://craflin.netlify.app"     // (or Netlify if used)
   ],
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true,
-  optionsSuccessStatus: 200 // For legacy browser support
+  optionsSuccessStatus: 200
 };
 
-app.use(cors(corsOptions));
-
-// Handle preflight requests
+//  Handle preflight CORS requests first
 app.options('*', cors(corsOptions));
+
+//  Apply CORS
+app.use(cors(corsOptions));
 
 // Middleware
 app.use(express.json());
 
-// Database Connection
+//  Database Connection
 mongoose.connect(process.env.MONGODB_URI)
-  .then(() => console.log('Connected to MongoDB'))
-  .catch(err => console.error('MongoDB connection error:', err));
+  .then(() => console.log(' Connected to MongoDB'))
+  .catch(err => console.error(' MongoDB connection error:', err));
 
-// Routes
-app.use('/api/groups', groupRoutes); // Fixed endpoint path
+//  Routes
+app.use('/api/groups', groupRoutes); // Group routes
 
-// Health Check
+//  Health Check Route
 app.get('/', (req, res) => {
   res.status(200).json({ message: 'Server is running' });
 });
 
-// Error Handling Middleware
+// Global Error Handler
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ error: 'Internal Server Error' });
 });
 
+// Start Server
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(` Server running on port ${PORT}`);
 });
