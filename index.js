@@ -166,8 +166,6 @@
 
 
 
-
-
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
@@ -179,22 +177,31 @@ const authRoutes = require('./routes/authRoutes');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// ✅ CORS Middleware with all frontend URLs
+// ✅ CORS Middleware
 app.use(cors({
   origin: [
-    "http://localhost:5173",                   // local dev
-    "http://localhost:5123",                   // optional fallback local
-    "https://craflin-client.vercel.app",       // vercel deployed frontend
-    "https://craflin-client.web.app"           // firebase deployed frontend (if used)
+    "http://localhost:5173",
+    "http://localhost:5174",
+    "https://craflin-client.vercel.app",
+    "https://craflin-client.web.app"
   ],
-  methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true
 }));
+
+// ✅ Custom CORS Headers (Forcefully override Vercel issues)
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*"); // Use "*" or set specific URL like "http://localhost:5173"
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+  next();
+});
 
 // ✅ Middleware
 app.use(express.json());
 
-// ✅ Database Connection
+// ✅ MongoDB Connection
 mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true
@@ -211,13 +218,13 @@ app.get('/', (req, res) => {
   res.send('🎯 Craflin Server is running!');
 });
 
-// ✅ Error Handling Middleware
+// ✅ Error Handling
 app.use((err, req, res, next) => {
   console.error('Unhandled Error:', err);
   res.status(500).json({ error: 'Internal Server Error' });
 });
 
-// ✅ Server Start
+// ✅ Start Server
 app.listen(PORT, () => {
   console.log(`🚀 Server running at http://localhost:${PORT}`);
 });
