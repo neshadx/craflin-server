@@ -104,6 +104,7 @@
 
 
 
+
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
@@ -113,46 +114,39 @@ const groupRoutes = require('./routes/groupRoutes');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-//  Enhanced CORS Configuration
+//  CORS Configuration — place at the very top
 const corsOptions = {
-  origin: [
-    "http://localhost:5173", 
-    "http://localhost:5123", 
-    "https://craflin-client.web.app", // use your actual deployed client domain
-    "https://craflin.netlify.app"     // (or Netlify if used)
-  ],
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  origin: ["http://localhost:5173", "http://localhost:5123", "https://craflin-client.web.app"],
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true,
   optionsSuccessStatus: 200
 };
 
-//  Handle preflight CORS requests first
-app.options('*', cors(corsOptions));
+//  Handle Preflight (OPTIONS) Requests BEFORE all
+app.options("*", cors(corsOptions));
 
-//  Apply CORS
+// Use CORS and JSON parser
 app.use(cors(corsOptions));
-
-// Middleware
 app.use(express.json());
 
-//  Database Connection
-mongoose.connect(process.env.MONGODB_URI)
-  .then(() => console.log(' Connected to MongoDB'))
-  .catch(err => console.error(' MongoDB connection error:', err));
+// Connect MongoDB
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => console.log("Connected to MongoDB"))
+  .catch((err) => console.error("❌ MongoDB connection error:", err));
 
-//  Routes
-app.use('/api/groups', groupRoutes); // Group routes
+// API Routes
+app.use("/api/groups", groupRoutes);
 
-//  Health Check Route
-app.get('/', (req, res) => {
-  res.status(200).json({ message: 'Server is running' });
+// Health Check Route
+app.get("/", (req, res) => {
+  res.status(200).json({ message: "Server is running" });
 });
 
 // Global Error Handler
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).json({ error: 'Internal Server Error' });
+  res.status(500).json({ error: "Internal Server Error" });
 });
 
 // Start Server
