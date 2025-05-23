@@ -133,7 +133,7 @@ app.use(express.json());
 // Connect MongoDB
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("Connected to MongoDB"))
-  .catch((err) => console.error("❌ MongoDB connection error:", err));
+  .catch((err) => console.error("MongoDB connection error:", err));
 
 // API Routes
 app.use("/api/groups", groupRoutes);
