@@ -21,7 +21,7 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
-    await client.connect(); 
+    await client.connect();
 
     const db = client.db("craflinDB");
     const groupCollection = db.collection("groups");
@@ -70,8 +70,12 @@ async function run() {
       }
     });
 
+    app.get("/api/test", (req, res) => {
+      res.send({ message: "API is reachable" });
+    });
+
     app.get("/", (req, res) => {
-      res.send("🎯 Craflin backend is running!");
+      res.send(" Craflin backend is running!");
     });
 
     await client.db("admin").command({ ping: 1 });
