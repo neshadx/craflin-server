@@ -49,6 +49,27 @@ async function run() {
       }
     });
 
+    // Get My Groups
+    app.get("/api/groups/my", async (req, res) => {
+      try {
+        const token = req.headers.authorization?.split(" ")[1];
+        const userEmail = token;
+
+        if (!userEmail) {
+          return res.status(401).send({ error: "Unauthorized" });
+        }
+
+        const groups = await groupCollection
+          .find({ creatorEmail: userEmail })
+          .toArray();
+
+        res.send(groups);
+      } catch (err) {
+        console.error("GET /api/groups/my error:", err);
+        res.status(500).send({ error: "Failed to fetch user groups" });
+      }
+    });
+
     // Get Group by ID
     app.get("/api/groups/:id", async (req, res) => {
       try {
@@ -74,7 +95,7 @@ async function run() {
       }
     });
 
-    // ✅ Join Group (NEW ROUTE)
+    // Join Group
     app.patch("/api/groups/join/:id", async (req, res) => {
       try {
         const groupId = req.params.id;
@@ -105,14 +126,14 @@ async function run() {
       }
     });
 
-    // Test Route
+    // Test
     app.get("/api/test", (req, res) => {
       res.send({ message: "API is reachable" });
     });
 
     // Root
     app.get("/", (req, res) => {
-      res.send(" Craflin backend is running!");
+      res.send("Craflin backend is running!");
     });
 
     await client.db("admin").command({ ping: 1 });
@@ -125,5 +146,5 @@ async function run() {
 run().catch(console.dir);
 
 app.listen(port, () => {
-  console.log(` Server running on port ${port}`);
+  console.log(`Server running on port ${port}`);
 });
