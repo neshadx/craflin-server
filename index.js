@@ -26,7 +26,7 @@ async function run() {
     const db = client.db("craflinDB");
     const groupCollection = db.collection("groups");
 
-    // ✅ Create Group
+    //  Create Group
     app.post("/api/groups", async (req, res) => {
       try {
         const group = req.body;
@@ -38,7 +38,7 @@ async function run() {
       }
     });
 
-    // ✅ Get All Groups
+    //  Get All Groups
     app.get("/api/groups", async (req, res) => {
       try {
         const groups = await groupCollection.find().toArray();
@@ -49,7 +49,7 @@ async function run() {
       }
     });
 
-    // ✅ Get My Groups (Created OR Joined)
+    //  Get My Groups (Created OR Joined)
     app.get("/api/groups/my", async (req, res) => {
       try {
         const token = req.headers.authorization?.split(" ")[1];
@@ -72,7 +72,7 @@ async function run() {
       }
     });
 
-    // ✅ Get Group by ID
+    //  Get Group by ID
     app.get("/api/groups/:id", async (req, res) => {
       try {
         const id = req.params.id;
@@ -85,7 +85,7 @@ async function run() {
       }
     });
 
-    // ✅ Delete Group
+    //  Delete Group
     app.delete("/api/groups/:id", async (req, res) => {
       try {
         const id = req.params.id;
@@ -97,7 +97,7 @@ async function run() {
       }
     });
 
-    // ✅ Join Group
+    //  Join Group
     app.patch("/api/groups/join/:id", async (req, res) => {
       try {
         const groupId = req.params.id;
@@ -128,7 +128,7 @@ async function run() {
       }
     });
 
-    // ✅ Update Group by ID
+    //  Update Group by ID
     app.put("/api/groups/:id", async (req, res) => {
       try {
         const id = req.params.id;
@@ -150,12 +150,12 @@ async function run() {
       }
     });
 
-    // ✅ Test route
+    //  Test route
     app.get("/api/test", (req, res) => {
       res.send({ message: "API is reachable" });
     });
 
-    // ✅ Root route
+    //  Root route
     app.get("/", (req, res) => {
       res.send("Craflin backend is running!");
     });
